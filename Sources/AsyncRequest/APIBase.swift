@@ -17,6 +17,8 @@ open class APIBase {
     public var method = HTTPMethod.get
     public var path = ""
     public var queryItems = [URLQueryItem]()
+    public var contentType: String?
+    public var body: Data?
 
     public init() {
     }
@@ -25,6 +27,13 @@ open class APIBase {
         guard let url = buildURL() else { throw RequestError.invalidURL }
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
+
+        if let body = try encodeBody() {
+            urlRequest.setValue(contentType, forHTTPHeaderField: "content-type")
+            urlRequest.setValue("\(body.count)", forHTTPHeaderField: "content-length")
+            urlRequest.httpBody = body
+        }
+
         return urlRequest
     }
 
@@ -41,5 +50,9 @@ open class APIBase {
         }
 
         return components.url(relativeTo: baseURL)
+    }
+
+    open func encodeBody() throws -> Data? {
+        body
     }
 }

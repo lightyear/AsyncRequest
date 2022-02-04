@@ -35,6 +35,16 @@ class APIBaseTests: XCTestCase {
         request.queryItems = [URLQueryItem(name: "foo", value: "bar+baz")]
         expect(try request.buildURLRequest().url?.absoluteString) == "/?foo=bar%2Bbaz"
     }
+
+    func testBuildURLRequestBody() throws {
+        let request = TestRequest()
+        request.contentType = "text/plain"
+        request.body = Data("hello world".utf8)
+        let urlRequest = try request.buildURLRequest()
+        expect(urlRequest.value(forHTTPHeaderField: "content-type")) == "text/plain"
+        expect(urlRequest.httpBody) == Data("hello world".utf8)
+        expect(urlRequest.value(forHTTPHeaderField: "content-length")) == "11"
+    }
 }
 
 class TestRequest: APIBase, AsyncRequest {
