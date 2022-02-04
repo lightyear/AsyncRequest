@@ -45,6 +45,22 @@ class APIBaseTests: XCTestCase {
         expect(urlRequest.httpBody) == Data("hello world".utf8)
         expect(urlRequest.value(forHTTPHeaderField: "content-length")) == "11"
     }
+
+    func testBuildURLRequestBodyStream() throws {
+        let request = TestRequest()
+        request.contentType = "text/plain"
+        request.bodyStream = (stream: InputStream(data: Data("hello world".utf8)), count: 11)
+        let urlRequest = try request.buildURLRequest()
+        expect(urlRequest.value(forHTTPHeaderField: "content-type")) == "text/plain"
+        expect(urlRequest.value(forHTTPHeaderField: "content-length")) == "11"
+
+        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: 11)
+        defer { buffer.deallocate() }
+        urlRequest.httpBodyStream?.open()
+        let count = urlRequest.httpBodyStream?.read(buffer, maxLength: 11)
+        let data = Data(bytes: buffer, count: count ?? 0)
+        expect(data) == Data("hello world".utf8)
+    }
 }
 
 class TestRequest: APIBase, AsyncRequest {
