@@ -15,6 +15,14 @@ class APIBaseTests: XCTestCase {
         expect(try TestRequest().buildURLRequest().httpMethod) == "GET"
         expect(try TestRequest(method: .post).buildURLRequest().httpMethod) == "POST"
     }
+
+    func testBuildURLRequestURL() throws {
+        let request = TestRequest()
+        request.baseURL = URL(string: "http://test")
+        expect(try request.buildURLRequest().url?.absoluteString) == "http://test"
+        request.path = "/foo"
+        expect(try request.buildURLRequest().url?.absoluteString) == "http://test/foo"
+    }
 }
 
 class TestRequest: APIBase, AsyncRequest {
