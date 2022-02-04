@@ -16,7 +16,8 @@ open class APIBase {
     public var baseURL: URL?
     public var method = HTTPMethod.get
     public var path = ""
-    
+    public var queryItems = [URLQueryItem]()
+
     public init() {
     }
 
@@ -30,6 +31,15 @@ open class APIBase {
     private func buildURL() -> URL? {
         var components = URLComponents()
         components.path = path
+
+        if !queryItems.isEmpty {
+            var querySafe = CharacterSet.urlQueryAllowed
+            querySafe.remove("+")
+            components.percentEncodedQuery = queryItems.map {
+                "\($0.name.addingPercentEncoding(withAllowedCharacters: querySafe)!)=\($0.value?.addingPercentEncoding(withAllowedCharacters: querySafe) ?? "")"
+            }.joined(separator: "&")
+        }
+
         return components.url(relativeTo: baseURL)
     }
 }
