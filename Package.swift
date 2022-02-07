@@ -25,7 +25,8 @@ let package = Package(
             name: "AsyncRequestTests",
             dependencies: [
                 "AsyncRequest",
-                "Nimble"
+                "Nimble",
+                .product(name: "OHHTTPStubsSwift", package: "OHHTTPStubs")
             ]),
     ]
 )

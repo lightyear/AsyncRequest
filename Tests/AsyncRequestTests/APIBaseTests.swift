@@ -8,9 +8,16 @@
 
 import XCTest
 import Nimble
+import OHHTTPStubs
+import OHHTTPStubsSwift
 import AsyncRequest
 
 class APIBaseTests: XCTestCase {
+    override func tearDown() {
+        HTTPStubs.removeAllStubs()
+        super.tearDown()
+    }
+
     func testBuildURLRequestMethod() throws {
         expect(try TestRequest().buildURLRequest().httpMethod) == "GET"
         expect(try TestRequest(method: .post).buildURLRequest().httpMethod) == "POST"
@@ -61,6 +68,28 @@ class APIBaseTests: XCTestCase {
         let data = Data(bytes: buffer, count: count ?? 0)
         expect(data) == Data("hello world".utf8)
     }
+
+    func testStartSuccess() async throws {
+        stub(condition: isAbsoluteURLString("/")) { _ in
+            HTTPStubsResponse(data: Data(), statusCode: 200, headers: nil)
+        }
+
+        try await TestRequest().start()
+    }
+
+    func testStartNetworkError() async throws {
+        stub(condition: isAbsoluteURLString("/")) { _ in
+            HTTPStubsResponse(error: NSError(domain: NSURLErrorDomain, code: NSURLErrorNotConnectedToInternet, userInfo: nil))
+        }
+
+        do {
+            try await TestRequest().start()
+            fail("expected to throw")
+        } catch let error as NSError {
+            expect(error.domain) == NSURLErrorDomain
+            expect(error.code) == NSURLErrorNotConnectedToInternet
+        }
+    }
 }
 
 class TestRequest: APIBase, AsyncRequest {
@@ -71,6 +100,6 @@ class TestRequest: APIBase, AsyncRequest {
     }
 
     func start() async throws {
-        
+        _ = try await sendRequest()
     }
 }

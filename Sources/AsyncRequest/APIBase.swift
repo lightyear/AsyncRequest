@@ -10,9 +10,14 @@ import Foundation
 
 public enum RequestError: Error {
     case invalidURL
+    case nonHTTPResponse
 }
 
 open class APIBase {
+    public typealias DataResponseTuple = (data: Data, response: HTTPURLResponse)
+
+    public var session = URLSession(configuration: .ephemeral)
+    public var request: URLRequest?
     public var baseURL: URL?
     public var method = HTTPMethod.get
     public var path = ""
@@ -59,5 +64,26 @@ open class APIBase {
 
     open func encodeBody() throws -> Data? {
         body
+    }
+
+    public func sendRequest() async throws -> DataResponseTuple {
+        let request = try buildURLRequest()
+        self.request = request
+        return try await withCheckedThrowingContinuation { continuation in
+            self.session.dataTask(with: request) { data, urlResponse, error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+
+                guard let urlResponse = urlResponse as? HTTPURLResponse
+                else {
+                    continuation.resume(throwing: RequestError.nonHTTPResponse)
+                    return
+                }
+                continuation.resume(returning: (data: data ?? Data(), response: urlResponse))
+            }
+            .resume()
+        }
     }
 }
