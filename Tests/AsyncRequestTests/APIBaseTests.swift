@@ -92,7 +92,7 @@ class APIBaseTests: XCTestCase {
     }
 }
 
-class TestRequest: APIBase, AsyncRequest {
+fileprivate class TestRequest: APIBase, AsyncRequest {
     init(method: HTTPMethod = .get) {
         super.init()
         self.method = method
