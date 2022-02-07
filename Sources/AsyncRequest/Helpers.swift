@@ -13,4 +13,14 @@ extension APIBase.DataResponse {
         guard successCodes.contains(self.response.statusCode) else { throw RequestError.failed(self) }
         return self
     }
+
+    public func hasContentType(_ expectedType: String) throws -> APIBase.DataResponse {
+        guard !data.isEmpty else { return self }
+        if let contentType = response.value(forHTTPHeaderField: "Content-Type") {
+            if contentType == expectedType || contentType.hasPrefix("\(expectedType); charset=") {
+                return self
+            }
+        }
+        throw RequestError.contentTypeMismatch(self)
+    }
 }

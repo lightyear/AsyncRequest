@@ -12,6 +12,7 @@ public enum RequestError: Error {
     case invalidURL
     case nonHTTPResponse
     case failed(APIBase.DataResponse)
+    case contentTypeMismatch(APIBase.DataResponse)
 }
 
 open class APIBase {

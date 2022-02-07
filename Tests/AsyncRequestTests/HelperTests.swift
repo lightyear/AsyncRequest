@@ -49,6 +49,48 @@ class HelperTests: XCTestCase {
             fail("expected RequestError.failed, got \(error)")
         }
     }
+
+    func testCorrectContentType() async {
+        stub(condition: isAbsoluteURLString("/good")) { _ in
+            HTTPStubsResponse(data: Data("a".utf8), statusCode: 200, headers: ["content-type": "text/plain"])
+        }
+
+        do {
+            _ = try await TestRequest(path: "/good").start().hasContentType("text/plain")
+        } catch {
+            fail("expected not to throw, but caught \(error)")
+        }
+    }
+
+    func testCorrectContentTypeWithCharset() async {
+        stub(condition: isAbsoluteURLString("/good")) { _ in
+            HTTPStubsResponse(data: Data("a".utf8), statusCode: 200, headers: ["content-type": "text/plain; charset=utf-8"])
+        }
+
+        do {
+            _ = try await TestRequest(path: "/good").start().hasContentType("text/plain")
+        } catch {
+            fail("expected not to throw, but caught \(error)")
+        }
+    }
+
+    func testWrongContentType() async {
+        stub(condition: isAbsoluteURLString("/bad")) { _ in
+            HTTPStubsResponse(data: Data("a".utf8), statusCode: 200, headers: ["content-type": "text/html"])
+        }
+
+        do {
+            _ = try await TestRequest(path: "/bad").start().hasContentType("text/plain")
+            fail("expected to throw")
+        } catch let error as RequestError {
+            if case .contentTypeMismatch = error {
+            } else {
+                fail("expected RequestError.failed, got \(error)")
+            }
+        } catch {
+            fail("expected RequestError.contentTypeMismatch, got \(error)")
+        }
+    }
 }
 
 fileprivate class TestRequest: APIBase, AsyncRequest {
