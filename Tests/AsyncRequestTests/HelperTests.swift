@@ -91,6 +91,33 @@ class HelperTests: XCTestCase {
             fail("expected RequestError.contentTypeMismatch, got \(error)")
         }
     }
+
+    func testJSONDecodeSuccess() async {
+        stub(condition: isAbsoluteURLString("/good")) { _ in
+            HTTPStubsResponse(data: Data(#"{"a":42}"#.utf8), statusCode: 200, headers: nil)
+        }
+
+        do {
+            _ = try await TestRequest(path: "/good").start().decode(TestJSON.self, with: JSONDecoder())
+        } catch {
+            fail("expected not to throw, but caught \(error)")
+        }
+    }
+
+    func testJSONDecodeFailure() async {
+        stub(condition: isAbsoluteURLString("/bad")) { _ in
+            HTTPStubsResponse(data: Data("{}".utf8), statusCode: 200, headers: nil)
+        }
+
+        do {
+            _ = try await TestRequest(path: "/bad").start().decode(TestJSON.self, with: JSONDecoder())
+            fail("expected to throw")
+        } catch {
+            if !(error is DecodingError) {
+                fail("expected DecodingError, got \(error)")
+            }
+        }
+    }
 }
 
 fileprivate class TestRequest: APIBase, AsyncRequest {
@@ -102,4 +129,8 @@ fileprivate class TestRequest: APIBase, AsyncRequest {
     func start() async throws -> DataResponse {
         try await sendRequest()
     }
+}
+
+fileprivate struct TestJSON: Decodable {
+    let a: Int
 }

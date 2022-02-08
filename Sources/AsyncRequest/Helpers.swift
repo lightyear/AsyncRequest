@@ -23,4 +23,14 @@ extension APIBase.DataResponse {
         }
         throw RequestError.contentTypeMismatch(self)
     }
+
+    public func decode<T: Decodable, D: AnyDecoder>(_ type: T.Type, with decoder: D) throws -> T {
+        try decoder.decode(type, from: data)
+    }
 }
+
+public protocol AnyDecoder {
+    func decode<T: Decodable>(_ type: T.Type, from data: Data) throws -> T
+}
+
+extension JSONDecoder: AnyDecoder {}
