@@ -12,7 +12,7 @@ let package = Package(
             targets: ["AsyncRequest"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/Quick/Nimble", from: "9.2.1"),
+        .package(url: "https://github.com/Quick/Nimble", from: "10.0.0"),
         .package(url: "https://github.com/AliSoftware/OHHTTPStubs", from: "9.1.0")
     ],
     targets: [
