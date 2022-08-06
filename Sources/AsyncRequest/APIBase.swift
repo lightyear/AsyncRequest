@@ -34,12 +34,12 @@ open class APIBase {
     public init() {
     }
 
-    open func buildURLRequest() throws -> URLRequest {
+    open func buildURLRequest() async throws -> URLRequest {
         guard let url = buildURL() else { throw RequestError.invalidURL }
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = method.rawValue
 
-        if let body = try encodeBody() {
+        if let body = try await encodeBody() {
             urlRequest.setValue(contentType, forHTTPHeaderField: "content-type")
             urlRequest.setValue("\(body.count)", forHTTPHeaderField: "content-length")
             urlRequest.httpBody = body
@@ -67,12 +67,12 @@ open class APIBase {
         return components.url(relativeTo: baseURL)
     }
 
-    open func encodeBody() throws -> Data? {
+    open func encodeBody() async throws -> Data? {
         body
     }
 
-    public func sendRequest() async throws -> DataResponse {
-        let request = try buildURLRequest()
+    open func sendRequest() async throws -> DataResponse {
+        let request = try await buildURLRequest()
         self.request = request
         return try await withCheckedThrowingContinuation { continuation in
             self.session.dataTask(with: request) { data, urlResponse, error in

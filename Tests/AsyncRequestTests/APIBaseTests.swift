@@ -18,46 +18,53 @@ class APIBaseTests: XCTestCase {
         super.tearDown()
     }
 
-    func testBuildURLRequestMethod() throws {
-        expect(try TestRequest().buildURLRequest().httpMethod) == "GET"
-        expect(try TestRequest(method: .post).buildURLRequest().httpMethod) == "POST"
+    func testBuildURLRequestMethod() async throws {
+        var request = try await TestRequest().buildURLRequest()
+        expect(request.httpMethod)  == "GET"
+        request = try await TestRequest(method: .post).buildURLRequest()
+        expect(request.httpMethod) == "POST"
     }
 
-    func testBuildURLRequestURL() throws {
+    func testBuildURLRequestURL() async throws {
         let request = TestRequest()
         request.baseURL = URL(string: "http://test")
-        expect(try request.buildURLRequest().url?.absoluteString) == "http://test/"
+        var url = try await request.buildURLRequest().url?.absoluteString
+        expect(url) == "http://test/"
         request.path = "/foo"
-        expect(try request.buildURLRequest().url?.absoluteString) == "http://test/foo"
+        url = try await request.buildURLRequest().url?.absoluteString
+        expect(url) == "http://test/foo"
     }
 
-    func testBuildURLRequestQueryString() throws {
+    func testBuildURLRequestQueryString() async throws {
         let request = TestRequest()
         request.queryItems = [URLQueryItem(name: "foo", value: "bar")]
-        expect(try request.buildURLRequest().url?.absoluteString) == "/?foo=bar"
+        var url = try await request.buildURLRequest().url?.absoluteString
+        expect(url) == "/?foo=bar"
 
         request.queryItems = [URLQueryItem(name: "foo", value: "bar baz")]
-        expect(try request.buildURLRequest().url?.absoluteString) == "/?foo=bar%20baz"
+        url = try await request.buildURLRequest().url?.absoluteString
+        expect(url) == "/?foo=bar%20baz"
 
         request.queryItems = [URLQueryItem(name: "foo", value: "bar+baz")]
-        expect(try request.buildURLRequest().url?.absoluteString) == "/?foo=bar%2Bbaz"
+        url = try await request.buildURLRequest().url?.absoluteString
+        expect(url) == "/?foo=bar%2Bbaz"
     }
 
-    func testBuildURLRequestBody() throws {
+    func testBuildURLRequestBody() async throws {
         let request = TestRequest()
         request.contentType = "text/plain"
         request.body = Data("hello world".utf8)
-        let urlRequest = try request.buildURLRequest()
+        let urlRequest = try await request.buildURLRequest()
         expect(urlRequest.value(forHTTPHeaderField: "content-type")) == "text/plain"
         expect(urlRequest.httpBody) == Data("hello world".utf8)
         expect(urlRequest.value(forHTTPHeaderField: "content-length")) == "11"
     }
 
-    func testBuildURLRequestBodyStream() throws {
+    func testBuildURLRequestBodyStream() async throws {
         let request = TestRequest()
         request.contentType = "text/plain"
         request.bodyStream = (stream: InputStream(data: Data("hello world".utf8)), count: 11)
-        let urlRequest = try request.buildURLRequest()
+        let urlRequest = try await request.buildURLRequest()
         expect(urlRequest.value(forHTTPHeaderField: "content-type")) == "text/plain"
         expect(urlRequest.value(forHTTPHeaderField: "content-length")) == "11"
 
