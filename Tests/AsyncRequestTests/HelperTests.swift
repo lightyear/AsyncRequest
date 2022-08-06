@@ -12,6 +12,7 @@ import OHHTTPStubs
 import OHHTTPStubsSwift
 import AsyncRequest
 
+@MainActor
 class HelperTests: XCTestCase {
     override func tearDown() {
         HTTPStubs.removeAllStubs()
