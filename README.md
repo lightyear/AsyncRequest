@@ -6,7 +6,7 @@ AsyncRequest is a type-safe framework for building a suite of requests to commun
 
 Installation is done through Swift Package Manager. Paste the URL of this repo into Xcode or add this line to your `Package.swift`:
 
-    .package(url: "https://github.com/lightyear/AsyncRequest", from: "0.1.0")
+    .package(url: "https://github.com/lightyear/AsyncRequest", from: "0.2.0")
 
 ## Usage
 
@@ -38,7 +38,7 @@ class JSONPlaceholderAPI: APIBase {
         baseURL = URL(string: "https://jsonplaceholder.typicode.com")
     }
     
-    override func buildURLRequest() throws -> URLRequest {
+    override func buildURLRequest() async throws -> URLRequest {
         var urlRequest = try super.buildURLRequest()
         urlRequest?.setValue("application/json", forHTTPHeaderField: "Accept")
         return urlRequest
