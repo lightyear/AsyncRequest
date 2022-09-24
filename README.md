@@ -6,7 +6,7 @@ AsyncRequest is a type-safe framework for building a suite of requests to commun
 
 Installation is done through Swift Package Manager. Paste the URL of this repo into Xcode or add this line to your `Package.swift`:
 
-    .package(url: "https://github.com/lightyear/AsyncRequest", from: "0.2.0")
+    .package(url: "https://github.com/lightyear/AsyncRequest", from: "0.3.0")
 
 ## Usage
 
