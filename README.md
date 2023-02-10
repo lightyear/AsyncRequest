@@ -6,7 +6,7 @@ AsyncRequest is a type-safe framework for building a suite of requests to commun
 
 Installation is done through Swift Package Manager. Paste the URL of this repo into Xcode or add this line to your `Package.swift`:
 
-    .package(url: "https://github.com/lightyear/AsyncRequest", from: "0.3.0")
+    .package(url: "https://github.com/lightyear/AsyncRequest", from: "0.4.0")
 
 ## Usage
 
@@ -52,7 +52,7 @@ class JSONPlaceholderAPI: APIBase {
 }
 ```
 
-This subclass ensures that the `Accept` header is set for every request and validates both the HTTP status code and content type of the response. Take note that only the leaf classes conform to `Request`. This is important, because Swift does not look further down an inheritence hierarchy to find the proper implementation of a property or function when checking for protocol conformance.
+This subclass ensures that the `Accept` header is set for every request and validates both the HTTP status code and content type of the response. Take note that only the leaf classes conform to `AsyncRequest`. This is important, because Swift does not look further down an inheritence hierarchy to find the proper implementation of a property or function when checking for protocol conformance.
 
 ## Decoding JSON data
 
@@ -92,4 +92,4 @@ There are several useful helpers available to validate that the response data ma
 
 ## Testing
 
-You can test your `Request` conformances using any library that hooks into Apple's URL loading system, such as [OHHTTPStubs](https://github.com/AliSoftware/OHHTTPStubs).
+You can test your `AsyncRequest` conformances using any library that hooks into Apple's URL loading system, such as [OHHTTPStubs](https://github.com/AliSoftware/OHHTTPStubs).
