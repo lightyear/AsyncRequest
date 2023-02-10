@@ -78,7 +78,7 @@ open class APIBase {
     open func sendRequest(_ request: URLRequest) async throws -> DataResponse {
         return try await withCheckedThrowingContinuation { continuation in
             self.session.dataTask(with: request) { data, urlResponse, error in
-                if let error = error {
+                if let error {
                     continuation.resume(throwing: error)
                     return
                 }
